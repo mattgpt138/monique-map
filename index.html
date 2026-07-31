@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#cdeee0">
+<title>Monique's Birthday Weekend Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--mint:#cdeee0;--mint-deep:#6fb8a8;--forest:#3f7a68;--cream:#fffaf0;--sand:#f3e3cd;--blush:#f0b8ab;--terracotta:#d9825f;--ink:#5c4b3f;--gold:#d9b877;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Quicksand',system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#d5f1e7 0%,#e6f6ee 22%,#f6efdc 58%,#fbe6d8 100%);background-attachment:fixed;min-height:100vh;overflow-x:hidden;position:relative;}
+.clouds{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.cloud{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.95),rgba(255,255,255,0));filter:blur(6px);}
+.c1{width:260px;height:150px;top:4%;left:-18%;animation:drift 46s linear infinite;}
+.c2{width:200px;height:120px;top:22%;left:-30%;animation:drift 62s linear infinite 6s;opacity:.8;}
+.c3{width:320px;height:170px;top:56%;left:-40%;animation:drift 78s linear infinite 3s;opacity:.6;}
+@keyframes drift{to{transform:translateX(165vw);}}
+.sparkles{position:fixed;inset:0;pointer-events:none;z-index:1;}
+.sp{position:absolute;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.9);animation:twinkle 3.4s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.5);}50%{opacity:1;transform:scale(1.25);}}
+.burst{position:fixed;inset:0;pointer-events:none;z-index:99;}
+.particle{position:absolute;font-size:19px;animation:fly 1.15s ease-out forwards;}
+@keyframes fly{0%{opacity:1;transform:translateY(0) scale(.5) rotate(0deg);}100%{opacity:0;transform:translateY(-95px) scale(1.35) rotate(25deg);}}
+.wrap{position:relative;z-index:2;max-width:540px;margin:0 auto;padding:0 14px 40px;}
+header{text-align:center;padding:26px 6px 6px;}
+.mascot{font-size:52px;display:inline-block;animation:bob 3.6s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(63,122,104,.25));}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-12px) rotate(4deg);}}
+h1{font-family:'Baloo 2',cursive;font-size:1.72rem;line-height:1.15;color:var(--forest);margin-top:2px;letter-spacing:.3px;}
+h1 .yr{display:block;font-size:.72rem;letter-spacing:3px;color:var(--terracotta);font-family:'Quicksand';font-weight:700;margin-bottom:5px;text-transform:uppercase;}
+.sub{margin-top:8px;color:#9a7a63;font-size:.92rem;font-weight:500;}
+.rule{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 6px;color:var(--gold);}
+.rule span{height:1px;width:52px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.ask{font-family:'Baloo 2',cursive;text-align:center;font-size:1.16rem;color:var(--forest);margin:10px 0 4px;}
+.ask small{display:block;font-family:'Quicksand';font-size:.74rem;color:#9a7a63;font-weight:600;letter-spacing:.4px;margin-top:2px;}
+.daytoggle{display:flex;justify-content:center;gap:9px;margin:12px 0 4px;}
+.daybtn{padding:8px 16px;border-radius:22px;border:1.5px solid #e0c3a4;background:rgba(255,253,247,.85);color:#a8765a;font-weight:700;font-size:.8rem;font-family:'Quicksand';cursor:pointer;transition:all .2s;}
+.daybtn.active{background:var(--terracotta);color:#fff;border-color:var(--terracotta);box-shadow:0 4px 10px rgba(217,130,95,.32);}
+.moodgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:13px;padding:16px 0 6px;}
+.moodbtn{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fffdf7,#fdf3e2);border:1px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;box-shadow:0 5px 14px rgba(92,75,63,.13);transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;}
+.moodbtn:after{content:"";position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(217,184,119,.55);}
+.moodbtn .ic{font-size:27px;line-height:1;}
+.moodbtn .lab{font-size:.66rem;font-weight:700;color:#7a6350;margin-top:5px;text-align:center;letter-spacing:.3px;padding:0 6px;}
+.moodbtn:active{transform:scale(.94);}
+.moodbtn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 10px 18px rgba(92,75,63,.18);}
+.moodbtn.active{background:radial-gradient(circle at 50% 35%,#e8fbf2,#cdeee0);border-color:var(--mint-deep);box-shadow:0 0 0 4px rgba(111,184,168,.28),0 8px 16px rgba(63,122,104,.18);}
+.moodbtn.active .lab{color:var(--forest);}
+.surprise{display:block;margin:14px auto 0;padding:10px 22px;border-radius:22px;border:none;cursor:pointer;background:linear-gradient(120deg,#f7c8a8,#f0b8ab,#cdeee0);background-size:200% 200%;animation:shimmer 6s ease infinite;font-family:'Baloo 2',cursive;font-size:.95rem;color:#7a4f3a;box-shadow:0 5px 14px rgba(217,130,95,.25);}
+@keyframes shimmer{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+.map{position:relative;margin-top:18px;border-radius:26px;padding:16px 10px 24px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.18));border:1px dashed rgba(111,184,168,.55);box-shadow:inset 0 0 40px rgba(255,255,255,.5);}
+.maphead{text-align:center;font-family:'Baloo 2',cursive;color:var(--forest);font-size:1rem;margin-bottom:10px;}
+.maphead em{font-style:normal;color:var(--terracotta);}
+.home{width:fit-content;max-width:94%;margin:0 auto 6px;background:#fffdf7;border:1.5px solid var(--mint-deep);border-radius:18px;padding:9px 16px;text-align:center;font-size:.82rem;font-weight:700;color:var(--forest);box-shadow:0 5px 12px rgba(63,122,104,.14);}
+.home span{display:block;font-weight:500;font-size:.72rem;color:#9a7a63;margin-top:2px;}
+.trail{position:relative;margin-top:6px;}
+.trail svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;}
+.dot{position:absolute;left:50%;width:13px;height:13px;margin-left:-6.5px;border-radius:50%;background:#fffdf7;border:3px solid var(--mint-deep);z-index:1;box-shadow:0 0 0 4px rgba(205,238,224,.65);}
+.spot{position:absolute;width:63%;background:#fffdf8;border-radius:20px;padding:12px 14px 13px;z-index:2;border:1.5px solid var(--mint-deep);box-shadow:0 8px 20px rgba(92,75,63,.14);opacity:0;animation:popIn .55s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes popIn{from{opacity:0;transform:scale(.72) translateY(14px) rotate(-2deg);}to{opacity:1;transform:scale(1) translateY(0) rotate(0);}}
+.spot.closed{filter:saturate(.45);}
+.spot .num{position:absolute;top:-13px;left:-11px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;background:#fffdf7;border:1.5px solid var(--gold);box-shadow:0 3px 7px rgba(92,75,63,.16);}
+.spot h3{font-family:'Baloo 2',cursive;font-size:1rem;line-height:1.15;color:var(--forest);}
+.spot .tag{font-size:.7rem;color:var(--terracotta);font-weight:600;margin:2px 0 5px;font-style:italic;}
+.spot .addr{font-size:.71rem;color:#93826f;line-height:1.35;margin-bottom:6px;}
+.badge{display:inline-block;padding:3px 9px;border-radius:11px;font-size:.66rem;font-weight:700;}
+.badge.o{background:#d9f0e3;color:#3f8f6b;}
+.badge.x{background:#f6dcd9;color:#b5514f;}
+.dir{display:inline-block;margin-top:9px;font-size:.72rem;color:#fff;background:var(--terracotta);padding:6px 12px;border-radius:14px;text-decoration:none;font-weight:700;box-shadow:0 4px 9px rgba(217,130,95,.3);}
+.hint{text-align:center;color:#8ba79a;font-size:.9rem;padding:34px 20px;font-weight:600;line-height:1.6;}
+.hint .big{font-size:32px;display:block;margin-bottom:8px;animation:bob 3s ease-in-out infinite;}
+.glow{animation:popIn .55s cubic-bezier(.34,1.56,.64,1) forwards,glowpulse 1.7s ease-in-out .5s 3;}
+@keyframes glowpulse{0%,100%{box-shadow:0 8px 20px rgba(92,75,63,.14);}50%{box-shadow:0 0 0 7px rgba(240,184,171,.55),0 10px 24px rgba(217,130,95,.3);}}
+footer{text-align:center;padding:26px 12px 10px;color:#a8765a;font-size:.8rem;line-height:1.6;font-weight:600;}
+footer .hb{font-family:'Baloo 2',cursive;font-size:1.05rem;color:var(--forest);display:block;margin-bottom:4px;}
+@media(max-width:380px){.moodbtn{width:86px;height:86px;}h1{font-size:1.5rem;}.spot{width:68%;}}
+
+.sortrow{display:flex;justify-content:center;gap:9px;margin:14px 0 2px;flex-wrap:wrap;}
+.sortbtn{padding:8px 15px;border-radius:22px;border:1.5px solid #a9d8c9;background:rgba(255,253,247,.85);color:#4a7a68;font-weight:700;font-size:.78rem;font-family:'Quicksand';cursor:pointer;transition:all .2s;}
+.sortbtn.active{background:var(--mint-deep);color:#fff;border-color:var(--mint-deep);box-shadow:0 4px 10px rgba(111,184,168,.35);}
+.sortbtn.busy{opacity:.7;}
+.locnote{text-align:center;font-size:.7rem;color:#9a7a63;font-weight:600;margin-top:7px;min-height:15px;letter-spacing:.2px;}
+.region{display:inline-block;background:#eaf6f0;color:#4a7a68;border:1px solid #cfe8dd;border-radius:10px;padding:2px 8px;font-size:.63rem;font-weight:700;letter-spacing:.2px;margin-bottom:5px;}
+.dist{display:inline-block;background:#fdeee4;color:#c2703f;border:1px solid #f4d8c4;border-radius:10px;padding:2px 8px;font-size:.63rem;font-weight:700;margin-left:4px;}
+
+</style>
+</head><body>
+<div class="clouds"><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
+<div class="sparkles" id="sparkles"></div>
+<div class="burst" id="burst"></div>
+<div class="wrap">
+<header>
+<div class="mascot">🍄</div>
+<h1><span class="yr">A Birthday Weekend Treasure Map</span>Monique's Wander Map</h1>
+<div class="sub">Follow the little trail wherever it feels good 🦋</div>
+<div class="rule"><span></span>✦<span></span></div>
+</header>
+<div class="ask">What are you in the mood for?<small>tap a bubble and the map will bloom</small></div>
+<div class="daytoggle">
+<button class="daybtn active" id="d-sat">Sat, Aug 1</button>
+<button class="daybtn" id="d-sun">Sun, Aug 2</button>
+</div>
+<div class="moodgrid" id="moodgrid"></div>
+<button class="surprise" id="surprise">✨ Surprise me ✨</button>
+<div class="sortrow">
+<button class="sortbtn active" id="s-trail">🧭 Trail order</button>
+<button class="sortbtn" id="s-near">📍 Closest to me</button>
+</div>
+<div class="locnote" id="locnote"></div>
+<div class="map">
+<div class="maphead" id="maphead">Your trail starts at home</div>
+<div class="home">🏠 Home Base<span>Northwest Austin</span></div>
+<div class="trail" id="trail"><div class="hint"><span class="big">🌿</span>Pick a mood above and little glowing stops will pop up along your trail.</div></div>
+</div>
+<footer><span class="hb">Happy Birthday, Monique! 🎂</span>Made with mushrooms, sparkles &amp; love.</footer>
+</div><script>
+var HOME_LAT=30.45, HOME_LNG=-97.80;
+var day="sat",mood=null,focusName=null,sortMode="trail",myPos=null,posSource=null;
+var MOODS=[{k:"forage",label:"Foraging",ic:"🍄"},{k:"books",label:"Books",ic:"📚"},{k:"paper",label:"Paper &amp; Stationery",ic:"✉️"},{k:"sweet",label:"Sweet Treat",ic:"🍰"},{k:"coffee",label:"Coffee",ic:"☕"},{k:"lunch",label:"Lunch",ic:"🥣"}];
+var PLACES={
+forage:[
+{n:"Homesense",a:"14028 US-183 Sb, Austin, TX 78717",r:"Northwest Austin · close to home",la:30.4732,lo:-97.7960,t:"treasure aisles, no map needed",sat:"9:30 AM – 9:30 PM",sun:"9:30 AM – 9:30 PM",ic:"🧺"},
+{n:"T.J. Maxx",a:"11066 Pecan Park Blvd, Cedar Park, TX 78613",r:"Cedar Park · just north",la:30.4890,lo:-97.8110,t:"the classic dig",sat:"9:30 AM – 9:30 PM",sun:"9:30 AM – 9:30 PM",ic:"🌿"},
+{n:"Marshalls",a:"5001 183A Toll Rd, Cedar Park, TX 78613",r:"Cedar Park · just north",la:30.5100,lo:-97.8290,t:"one more rack, promise",sat:"9:30 AM – 9:30 PM",sun:"9:30 AM – 9:30 PM",ic:"🍃"}],
+books:[
+{n:"Birdhouse Books",a:"5925 Burnet Rd, Austin, TX 78757",r:"Central Austin · Burnet Rd",la:30.3345,lo:-97.7395,t:"a cozy nest of stories",sat:"10:00 AM – 6:00 PM",sun:"10:00 AM – 6:00 PM",ic:"🐦"},
+{n:"Livra Books",a:"4101 Guadalupe St #200, Austin, TX 78751",r:"Central Austin · North Loop",la:30.3115,lo:-97.7345,t:"stay late if you like",sat:"10:00 AM – 9:00 PM",sun:"12:00 PM – 5:00 PM",ic:"📖"},
+{n:"Reverie Books",a:"5330 Menchaca Rd Ste D, Austin, TX 78745",r:"South Austin · Menchaca",la:30.2210,lo:-97.7920,t:"daydreams, aisle three",sat:"10:00 AM – 8:00 PM",sun:"10:00 AM – 8:00 PM",ic:"🌙"}],
+paper:[
+{n:"Paper Source",a:"3200 Palm Way #116, Austin, TX 78758",r:"North Austin · The Domain",la:30.4020,lo:-97.7250,t:"pretty things by the ream",sat:"10:00 AM – 8:00 PM",sun:"11:00 AM – 6:00 PM",ic:"🎀"},
+{n:"Paper Place",a:"4001 N Lamar Blvd #540, Austin, TX 78756",r:"Central Austin · N Lamar",la:30.3095,lo:-97.7395,t:"the fancy pens live here",sat:"10:00 AM – 6:00 PM",sun:"12:00 PM – 5:00 PM",ic:"🖋️"},
+{n:"The Paper + Craft Pantry",a:"1023 Springdale Rd Bldg 6A, Austin, TX 78721",r:"East Side · Springdale",la:30.2660,lo:-97.6890,t:"tiny, dreamy, east side",sat:"11:00 AM – 5:00 PM",sun:"11:00 AM – 5:00 PM",ic:"✂️"}],
+sweet:[
+{n:"TOUS les JOURS",a:"11301 Lakeline Blvd Unit #106, Austin, TX 78717",r:"Northwest Austin · close to home",la:30.4680,lo:-97.8090,t:"tray + tongs = joy",sat:"9:00 AM – 8:00 PM",sun:"9:00 AM – 8:00 PM",ic:"🥐"},
+{n:"Hayley Cakes and Cookies",a:"10601 Ranch to Market Rd 2222 Ste m, Austin, TX 78730",r:"West Austin · RM 2222",la:30.3660,lo:-97.8320,t:"birthday cookie energy",sat:"7:00 AM – 6:00 PM",sun:"Closed",ic:"🍪"},
+{n:"Tinys Milk &amp; Cookies",a:"1515 W 35th St Bldg c, Austin, TX 78703",r:"Central Austin · W 35th",la:30.3060,lo:-97.7550,t:"warm cookie, cold milk",sat:"7:00 AM – 9:00 PM",sun:"7:00 AM – 9:00 PM",ic:"🥛"},
+{n:"Quack's 43rd Street Bakery",a:"411 E 43rd St, Austin, TX 78751",r:"Central Austin · Hyde Park",la:30.3130,lo:-97.7280,t:"old-Austin pastry case",sat:"7:00 AM – 9:00 PM",sun:"7:00 AM – 9:00 PM",ic:"🦆"},
+{n:"ThoroughBread",a:"1709 Bluebonnet Ln, Austin, TX 78704",r:"South Austin · Zilker area",la:30.2450,lo:-97.7690,t:"go early, worth it",sat:"8:00 AM – 2:00 PM",sun:"8:00 AM – 2:00 PM",ic:"🥖"},
+{n:"Sugar Mama's Bakeshop",a:"1905 S 1st St, Austin, TX 78704",r:"South Austin · S 1st",la:30.2450,lo:-97.7570,t:"cupcake as a personality",sat:"10:00 AM – 7:00 PM",sun:"Closed",ic:"🧁"}],
+coffee:[
+{n:"Godsent Coffee",a:"9817 Anderson Mill Rd, Austin, TX 78750",r:"Northwest Austin · close to home",la:30.4487,lo:-97.7838,t:"first stop of the day",sat:"8:00 AM – 3:00 PM",sun:"Closed",ic:"☕"}],
+lunch:[
+{n:"SoupGreen Buffet",a:"13450 Research Blvd #112, Austin, TX 78750",r:"Northwest Austin · close to home",la:30.4460,lo:-97.7910,t:"a whole green refuel",sat:"11:00 AM – 9:00 PM",sun:"11:00 AM – 9:00 PM",ic:"🥗"}]};
+
+function miles(la1,lo1,la2,lo2){var R=3958.8,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,p1=la1*Math.PI/180,p2=la2*Math.PI/180;var x=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(p1)*Math.cos(p2)*Math.sin(dLo/2)*Math.sin(dLo/2);return 2*R*Math.asin(Math.sqrt(x));}
+function mapsUrl(d){var u="https://www.google.com/maps/dir/?api=1";if(myPos&&posSource==="device"){u+="&origin="+encodeURIComponent(myPos.la+","+myPos.lo);}return u+"&destination="+encodeURIComponent(d)+"&travelmode=driving";}
+function makeSparkles(){var b=document.getElementById("sparkles");for(var i=0;i<30;i++){var s=document.createElement("span");s.className="sp";var z=2+Math.random()*4;s.style.width=z+"px";s.style.height=z+"px";s.style.left=(Math.random()*100)+"%";s.style.top=(Math.random()*100)+"%";s.style.animationDelay=(Math.random()*3.4)+"s";b.appendChild(s);}}
+function burst(x,y){var b=document.getElementById("burst"),em=["✨","🌸","🍄","🦋","⭐","🌿"];for(var i=0;i<11;i++){(function(i){var p=document.createElement("span");p.className="particle";p.textContent=em[i%em.length];p.style.left=(x+(Math.random()*70-35))+"px";p.style.top=(y+(Math.random()*20-10))+"px";p.style.animationDelay=(Math.random()*0.25)+"s";b.appendChild(p);setTimeout(function(){if(p.parentNode){p.parentNode.removeChild(p);}},1600);})(i);}}
+function buildMoods(){var g=document.getElementById("moodgrid");MOODS.forEach(function(m){var b=document.createElement("button");b.className="moodbtn";b.id="m-"+m.k;b.innerHTML='<span class="ic">'+m.ic+'</span><span class="lab">'+m.label+'</span>';b.addEventListener("click",function(){var r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);focusName=null;pick(m.k);});g.appendChild(b);});}
+function pick(k){mood=k;MOODS.forEach(function(m){document.getElementById("m-"+m.k).className="moodbtn"+(m.k===k?" active":"");});render();}
+function setDay(d){day=d;document.getElementById("d-sat").className="daybtn"+(d==="sat"?" active":"");document.getElementById("d-sun").className="daybtn"+(d==="sun"?" active":"");render();}
+function setSortBtns(){document.getElementById("s-trail").className="sortbtn"+(sortMode==="trail"?" active":"");document.getElementById("s-near").className="sortbtn"+(sortMode==="near"?" active":"");}
+function note(txt){document.getElementById("locnote").innerHTML=txt;}
+function useTrailOrder(){sortMode="trail";setSortBtns();note("");render();}
+function useNearest(){
+ sortMode="near";setSortBtns();
+ if(myPos){note(posSource==="device"?"📍 Sorted by distance from where you are now":"🏠 Location off — sorted from Home Base (northwest Austin)");render();return;}
+ var btn=document.getElementById("s-near");btn.className="sortbtn active busy";note("Finding you…");
+ if(!navigator.geolocation){myPos={la:HOME_LAT,lo:HOME_LNG};posSource="home";btn.className="sortbtn active";note("🏠 Location not available — sorted from Home Base (northwest Austin)");render();return;}
+ navigator.geolocation.getCurrentPosition(function(p){
+  myPos={la:p.coords.latitude,lo:p.coords.longitude};posSource="device";btn.className="sortbtn active";
+  note("📍 Sorted by distance from where you are now");render();
+ },function(){
+  myPos={la:HOME_LAT,lo:HOME_LNG};posSource="home";btn.className="sortbtn active";
+  note("🏠 Location off — sorted from Home Base (northwest Austin)");render();
+ },{enableHighAccuracy:false,timeout:8000,maximumAge:300000});
+}
+function trailPath(h,n){var d="M 50 0";for(var i=0;i<n;i++){var y=i*150;d+=" Q "+(i%2===0?16:84)+" "+(y+75)+" 50 "+(y+150);}return '<svg viewBox="0 0 100 '+h+'" preserveAspectRatio="none"><path d="'+d+'" fill="none" stroke="#7cc0ad" stroke-width="1.1" stroke-dasharray="3 4" stroke-linecap="round" opacity="0.8"/></svg>';}
+function layout(){var trail=document.getElementById("trail");var cards=trail.querySelectorAll(".spot");var dots=trail.querySelectorAll(".dot");if(!cards.length){return;}var y=14,ys=[];for(var i=0;i<cards.length;i++){cards[i].style.top=y+"px";var mid=y+Math.min(46,cards[i].offsetHeight/2);ys.push(mid);if(dots[i]){dots[i].style.top=(mid-6)+"px";}y+=cards[i].offsetHeight+44;}var total=y+6;trail.style.height=total+"px";var d="M 50 0",prev=0;for(var j=0;j<ys.length;j++){d+=" Q "+((j%2===0)?12:88)+" "+((prev+ys[j])/2)+" 50 "+ys[j];prev=ys[j];}d+=" L 50 "+total;var svg=trail.querySelector("svg");if(svg){svg.setAttribute("viewBox","0 0 100 "+total);svg.querySelector("path").setAttribute("d",d);}}
+window.addEventListener("resize",function(){if(mood){layout();}});
+function render(){
+ var trail=document.getElementById("trail"),head=document.getElementById("maphead"),dayLabel=(day==="sat"?"Saturday":"Sunday");
+ if(!mood){head.innerHTML="Your trail starts at home";trail.style.height="";trail.innerHTML='<div class="hint"><span class="big">🌿</span>Pick a mood above and little glowing stops will pop up along your trail.</div>';return;}
+ var m=MOODS.filter(function(x){return x.k===mood;})[0];var items=PLACES[mood].slice();
+ if(sortMode==="near"&&myPos){items.forEach(function(p){p.d=miles(myPos.la,myPos.lo,p.la,p.lo);});}
+ items.sort(function(a,b){
+  var ac=(a[day]==="Closed")?1:0,bc=(b[day]==="Closed")?1:0;
+  if(ac!==bc){return ac-bc;}
+  if(sortMode==="near"&&myPos){return a.d-b.d;}
+  return 0;});
+ head.innerHTML=m.ic+" <em>"+m.label+"</em> &middot; "+dayLabel+(sortMode==="near"&&myPos?" &middot; nearest first":"");
+ var html=trailPath(1000,items.length);
+ items.forEach(function(p,i){
+  var top=16+i*150,left=(i%2===0?"1%":"34%"),isOpen=(p[day]!=="Closed");
+  var badge=isOpen?'<span class="badge o">Open '+p[day]+'</span>':'<span class="badge x">Closed '+dayLabel+'</span>';
+  var dist=(myPos&&typeof p.d==="number")?'<span class="dist">'+(p.d<10?p.d.toFixed(1):Math.round(p.d))+' mi</span>':'';
+  var dirLabel=(posSource==="device")?"Directions from here →":"Directions →";
+  html+='<span class="dot" style="top:'+(top+44)+'px"></span>';
+  html+='<div class="spot'+(isOpen?"":" closed")+(focusName===p.n?" glow":"")+'" id="sp-'+i+'" style="top:'+top+'px;left:'+left+';animation-delay:'+(i*0.08)+'s"><span class="num">'+p.ic+'</span><h3>'+p.n+'</h3><div class="tag">'+p.t+'</div><span class="region">'+p.r+'</span>'+dist+'<div class="addr">'+p.a+'</div>'+badge+'<br><a class="dir" target="_blank" rel="noopener" href="'+mapsUrl(p.n+", "+p.a)+'">'+dirLabel+'</a></div>';
+ });
+ trail.innerHTML=html;layout();setTimeout(layout,120);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(layout);}
+ if(focusName){items.forEach(function(p,i){if(p.n===focusName){setTimeout(function(){var el=document.getElementById("sp-"+i);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});}},300);}});}
+}
+function surpriseMe(){var pool=[];Object.keys(PLACES).forEach(function(k){PLACES[k].forEach(function(p){if(p[day]!=="Closed"){pool.push({k:k,p:p});}});});var c=pool[Math.floor(Math.random()*pool.length)];var r=document.getElementById("surprise").getBoundingClientRect();burst(r.left+r.width/2,r.top);focusName=c.p.n;pick(c.k);}
+makeSparkles();buildMoods();
+document.getElementById("d-sat").addEventListener("click",function(){setDay("sat");});
+document.getElementById("d-sun").addEventListener("click",function(){setDay("sun");});
+document.getElementById("s-trail").addEventListener("click",useTrailOrder);
+document.getElementById("s-near").addEventListener("click",useNearest);
+document.getElementById("surprise").addEventListener("click",surpriseMe);
+render();
+</script>
+</body>
+</html>
