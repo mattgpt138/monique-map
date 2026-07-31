@@ -254,27 +254,36 @@ function lookUp(){
  var n=fv("f-name"),a=fv("f-addr"),line=document.getElementById("f-look-line");
  if(!n&&!a){line.textContent="Type a name or address first 🌿";return;}
  line.textContent="Looking…";
- fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&extratags=1&addressdetails=1&limit=1&q="+encodeURIComponent(n+" "+a+" Austin TX"))
- .then(function(r){return r.json();})
- .then(function(j){
-  if(!j||!j.length){line.textContent="Could not find it — you can still add it by hand 💛";return;}
-  var x=j[0];pend.la=+x.lat;pend.lo=+x.lon;
-  var ad=x.address||{},city=ad.city||ad.town||ad.village;
-  pend.r=regionFor(pend.la,pend.lo,city);
-  if(!fv("f-name")&&x.name){document.getElementById("f-name").value=x.name;}
-  var road=ad.house_number?(ad.house_number+" "+(ad.road||"")):(ad.road||"");
-  var full=[road,city,ad.state,ad.postcode].filter(Boolean).join(", ");
-  if(full.length>8){document.getElementById("f-addr").value=full;}
-  var msg="✓ Found it · "+pend.r;
-  var oh=x.extratags&&x.extratags.opening_hours;
-  if(oh){
-   var p=parseOSM(oh),filled=[];
-   if(p.sat&&!fv("f-sat")){document.getElementById("f-sat").value=p.sat;filled.push("Sat");}
-   if(p.sun&&!fv("f-sun")){document.getElementById("f-sun").value=p.sun;filled.push("Sun");}
-   msg+=filled.length?(" · filled in "+filled.join(" & ")+" hours from OpenStreetMap — worth double-checking"):(" · listed hours: "+oh);
-  } else { msg+=" · no hours on file, tap Hours on Google Maps"; }
-  line.textContent=msg;
- }).catch(function(){line.textContent="Lookup hiccup — add it by hand and it still works 💛";});
+ var qs=[];
+ if(n&&a){qs.push(n+", "+a+", Austin TX");}
+ if(n){qs.push(n+", Austin TX");}
+ if(a){qs.push(a+", Austin TX");}
+ function tryNext(){
+  if(!qs.length){line.textContent="Could not find it — you can still add it by hand 💛";return;}
+  var q=qs.shift();
+  fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&extratags=1&addressdetails=1&limit=1&q="+encodeURIComponent(q))
+  .then(function(r){return r.json();})
+  .then(function(j){
+   if(!j||!j.length){tryNext();return;}
+   var x=j[0];pend.la=+x.lat;pend.lo=+x.lon;
+   var ad=x.address||{},city=ad.city||ad.town||ad.village;
+   pend.r=regionFor(pend.la,pend.lo,city);
+   if(!fv("f-name")&&x.name){document.getElementById("f-name").value=x.name;}
+   var road=ad.house_number?(ad.house_number+" "+(ad.road||"")):(ad.road||"");
+   var full=[road,city,ad.state,ad.postcode].filter(Boolean).join(", ");
+   if(full.length>8){document.getElementById("f-addr").value=full;}
+   var msg="✓ Found it · "+pend.r;
+   var oh=x.extratags&&x.extratags.opening_hours;
+   if(oh){
+    var p=parseOSM(oh),filled=[];
+    if(p.sat&&!fv("f-sat")){document.getElementById("f-sat").value=p.sat;filled.push("Sat");}
+    if(p.sun&&!fv("f-sun")){document.getElementById("f-sun").value=p.sun;filled.push("Sun");}
+    msg+=filled.length?(" · filled in "+filled.join(" & ")+" hours from OpenStreetMap — worth double-checking"):(" · listed hours: "+oh);
+   } else { msg+=" · no hours on file, tap Hours on Google Maps"; }
+   line.textContent=msg;
+  }).catch(function(){line.textContent="Lookup hiccup — add it by hand and it still works 💛";});
+ }
+ tryNext();
 }
 function gmapsLook(){window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(fv("f-name")+" "+fv("f-addr")+" Austin TX"),"_blank","noopener");}
 function saveStop(){
