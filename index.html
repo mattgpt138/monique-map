@@ -84,6 +84,28 @@ footer .hb{font-family:'Baloo 2',cursive;font-size:1.05rem;color:var(--forest);d
 .region{display:inline-block;background:#eaf6f0;color:#4a7a68;border:1px solid #cfe8dd;border-radius:10px;padding:2px 8px;font-size:.63rem;font-weight:700;letter-spacing:.2px;margin-bottom:5px;}
 .dist{display:inline-block;background:#fdeee4;color:#c2703f;border:1px solid #f4d8c4;border-radius:10px;padding:2px 8px;font-size:.63rem;font-weight:700;margin-left:4px;}
 
+
+.addwrap{max-width:540px;margin:16px auto 0;}
+.addbtn{display:block;margin:0 auto;padding:9px 20px;border-radius:22px;border:1.5px dashed var(--gold);background:rgba(255,253,247,.9);color:#8a6a45;font-weight:700;font-size:.82rem;font-family:'Quicksand';cursor:pointer;}
+.addbtn:active{transform:scale(.97);}
+.addpanel{display:none;margin-top:12px;background:#fffdf8;border:1.5px solid var(--gold);border-radius:20px;padding:14px;box-shadow:0 8px 20px rgba(92,75,63,.12);}
+.addpanel.open{display:block;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) forwards;}
+.addpanel h4{font-family:'Baloo 2',cursive;color:var(--forest);font-size:1.02rem;}
+.addpanel .tiny{font-size:.68rem;color:#9a7a63;font-weight:600;margin:2px 0 10px;}
+.fld{margin-bottom:9px;}
+.fld label{display:block;font-size:.67rem;font-weight:700;color:#7a6350;margin-bottom:3px;letter-spacing:.2px;}
+.fld input,.fld select{width:100%;padding:9px 10px;border-radius:12px;border:1.5px solid #e3d6c2;background:#fffefb;font-family:'Quicksand';font-size:.8rem;color:var(--ink);font-weight:600;}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--mint-deep);}
+.row2{display:flex;gap:8px;}
+.row2 .fld{flex:1;}
+.mini{padding:8px 13px;border-radius:14px;border:none;background:var(--mint-deep);color:#fff;font-weight:700;font-size:.72rem;font-family:'Quicksand';cursor:pointer;}
+.mini.ghost{background:#fff;color:#4a7a68;border:1.5px solid #a9d8c9;}
+.lookline{font-size:.68rem;color:#4a7a68;font-weight:700;margin:6px 0 9px;min-height:14px;line-height:1.4;}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap;}
+.mine{border-style:dashed !important;border-color:var(--gold) !important;background:#fffcf3 !important;}
+.pick{display:inline-block;background:#fdf1dc;color:#a07b3c;border:1px solid #eeddb8;border-radius:10px;padding:2px 8px;font-size:.62rem;font-weight:700;margin-bottom:5px;}
+.rm{position:absolute;top:6px;right:9px;border:none;background:transparent;color:#c9a37a;font-size:13px;cursor:pointer;font-weight:700;padding:2px 4px;}
+.badge.u{background:#efe9df;color:#8a7a68;}
 </style>
 </head><body>
 <div class="clouds"><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
@@ -108,6 +130,21 @@ footer .hb{font-family:'Baloo 2',cursive;font-size:1.05rem;color:var(--forest);d
 <button class="sortbtn" id="s-near">📍 Closest to me</button>
 </div>
 <div class="locnote" id="locnote"></div>
+<div class="addwrap">
+<button class="addbtn" id="addtoggle">➕ Add a stop</button>
+<div class="addpanel" id="addpanel">
+<h4>Add your own stop</h4>
+<div class="tiny">Type a place, tap Look it up, and it lands on your trail in the category you pick.</div>
+<div class="fld"><label>Place name</label><input id="f-name" placeholder="e.g. Radio Coffee &amp; Beer"></div>
+<div class="fld"><label>Address or neighborhood</label><input id="f-addr" placeholder="e.g. 4204 Menchaca Rd, Austin"></div>
+<div class="acts" style="justify-content:flex-start"><button class="mini" id="f-look">🔍 Look it up</button><button class="mini ghost" id="f-gmaps">Hours on Google Maps ↗</button></div>
+<div class="lookline" id="f-look-line"></div>
+<div class="fld"><label>Which category?</label><select id="f-cat"></select></div>
+<div class="row2"><div class="fld"><label>Saturday hours</label><input id="f-sat" placeholder="10:00 AM – 6:00 PM"></div><div class="fld"><label>Sunday hours</label><input id="f-sun" placeholder="Closed"></div></div>
+<div class="fld"><label>Little note (optional)</label><input id="f-note" placeholder="e.g. patio + breakfast tacos"></div>
+<div class="acts"><button class="mini ghost" id="f-cancel">Cancel</button><button class="mini" id="f-save">Add to map ✨</button></div>
+</div>
+</div>
 <div class="map">
 <div class="maphead" id="maphead">Your trail starts at home</div>
 <div class="home">🏠 Home Base<span>Northwest Austin</span></div>
@@ -172,27 +209,98 @@ window.addEventListener("resize",function(){if(mood){layout();}});
 function render(){
  var trail=document.getElementById("trail"),head=document.getElementById("maphead"),dayLabel=(day==="sat"?"Saturday":"Sunday");
  if(!mood){head.innerHTML="Your trail starts at home";trail.style.height="";trail.innerHTML='<div class="hint"><span class="big">🌿</span>Pick a mood above and little glowing stops will pop up along your trail.</div>';return;}
- var m=MOODS.filter(function(x){return x.k===mood;})[0];var items=PLACES[mood].slice();
- if(sortMode==="near"&&myPos){items.forEach(function(p){p.d=miles(myPos.la,myPos.lo,p.la,p.lo);});}
+ var m=MOODS.filter(function(x){return x.k===mood;})[0];var items=itemsFor(mood).slice();
+ if(sortMode==="near"&&myPos){items.forEach(function(p){p.d=(typeof p.la==="number")?miles(myPos.la,myPos.lo,p.la,p.lo):9999;});}
  items.sort(function(a,b){
   var ac=(a[day]==="Closed")?1:0,bc=(b[day]==="Closed")?1:0;
   if(ac!==bc){return ac-bc;}
-  if(sortMode==="near"&&myPos){return a.d-b.d;}
+  if(sortMode==="near"&&myPos){return (a.d||0)-(b.d||0);}
   return 0;});
  head.innerHTML=m.ic+" <em>"+m.label+"</em> &middot; "+dayLabel+(sortMode==="near"&&myPos?" &middot; nearest first":"");
  var html=trailPath(1000,items.length);
  items.forEach(function(p,i){
-  var top=16+i*150,left=(i%2===0?"1%":"34%"),isOpen=(p[day]!=="Closed");
-  var badge=isOpen?'<span class="badge o">Open '+p[day]+'</span>':'<span class="badge x">Closed '+dayLabel+'</span>';
-  var dist=(myPos&&typeof p.d==="number")?'<span class="dist">'+(p.d<10?p.d.toFixed(1):Math.round(p.d))+' mi</span>':'';
+  var top=16+i*150,left=(i%2===0?"1%":"34%"),hv=p[day],isOpen=(!!hv&&hv!=="Closed");
+  var badge=(!hv)?'<span class="badge u">Hours: check before you go</span>':(isOpen?'<span class="badge o">Open '+hv+'</span>':'<span class="badge x">Closed '+dayLabel+'</span>');
+  var dist=(myPos&&typeof p.d==="number"&&p.d<9000)?'<span class="dist">'+(p.d<10?p.d.toFixed(1):Math.round(p.d))+' mi</span>':'';
   var dirLabel=(posSource==="device")?"Directions from here →":"Directions →";
   html+='<span class="dot" style="top:'+(top+44)+'px"></span>';
-  html+='<div class="spot'+(isOpen?"":" closed")+(focusName===p.n?" glow":"")+'" id="sp-'+i+'" style="top:'+top+'px;left:'+left+';animation-delay:'+(i*0.08)+'s"><span class="num">'+p.ic+'</span><h3>'+p.n+'</h3><div class="tag">'+p.t+'</div><span class="region">'+p.r+'</span>'+dist+'<div class="addr">'+p.a+'</div>'+badge+'<br><a class="dir" target="_blank" rel="noopener" href="'+mapsUrl(p.n+", "+p.a)+'">'+dirLabel+'</a></div>';
+  html+='<div class="spot'+(p.mine?" mine":"")+(isOpen?"":" closed")+(focusName===p.n?" glow":"")+'" id="sp-'+i+'" style="top:'+top+'px;left:'+left+';animation-delay:'+(i*0.08)+'s"><span class="num">'+p.ic+'</span>'+(p.mine?'<button class="rm" data-id="'+p.id+'">✕</button>':'')+'<h3>'+p.n+'</h3><div class="tag">'+p.t+'</div>'+(p.mine?'<span class="pick">✨ Monique picked this</span> ':'')+'<span class="region">'+p.r+'</span>'+dist+'<div class="addr">'+p.a+'</div>'+badge+'<br><a class="dir" target="_blank" rel="noopener" href="'+mapsUrl(p.n+", "+p.a)+'">'+dirLabel+'</a></div>';
  });
- trail.innerHTML=html;layout();setTimeout(layout,120);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(layout);}
+ trail.innerHTML=html;bindRemove();layout();setTimeout(layout,120);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(layout);}
  if(focusName){items.forEach(function(p,i){if(p.n===focusName){setTimeout(function(){var el=document.getElementById("sp-"+i);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});}},300);}});}
 }
 function surpriseMe(){var pool=[];Object.keys(PLACES).forEach(function(k){PLACES[k].forEach(function(p){if(p[day]!=="Closed"){pool.push({k:k,p:p});}});});var c=pool[Math.floor(Math.random()*pool.length)];var r=document.getElementById("surprise").getBoundingClientRect();burst(r.left+r.width/2,r.top);focusName=c.p.n;pick(c.k);}
+
+var STORE="mstops2026";
+function loadMine(){try{return JSON.parse(localStorage.getItem(STORE)||"[]");}catch(e){return [];}}
+function saveMine(a){try{localStorage.setItem(STORE,JSON.stringify(a));}catch(e){}}
+function itemsFor(k){return PLACES[k].concat(loadMine().filter(function(x){return x.k===k;}));}
+function bindRemove(){var b=document.querySelectorAll(".rm");for(var i=0;i<b.length;i++){b[i].addEventListener("click",function(ev){ev.preventDefault();var id=this.getAttribute("data-id");if(confirm("Take this stop off the map?")){saveMine(loadMine().filter(function(x){return String(x.id)!==String(id);}));render();}});}}
+function to12(t){var p=t.split(":");var h=parseInt(p[0],10),m=p[1]||"00";if(h===24||h===0){return "12:"+m+" AM";}var ap=h<12?"AM":"PM";var hh=h%12;if(hh===0){hh=12;}return hh+":"+m+" "+ap;}
+function parseOSM(s){var out={};if(!s){return out;}var days=["Mo","Tu","We","Th","Fr","Sa","Su"];s.split(";").forEach(function(rule){rule=rule.trim();if(!rule){return;}var m=rule.match(/^([A-Za-z,\-]+)\s+(.+)$/);if(!m){return;}var spec=m[1],time=m[2].trim(),set=[];spec.split(",").forEach(function(part){var rr=part.split("-");if(rr.length===2){var i1=days.indexOf(rr[0]),i2=days.indexOf(rr[1]);if(i1>-1&&i2>-1){for(var i=i1;i<=i2;i++){set.push(days[i]);}}}else if(days.indexOf(part)>-1){set.push(part);}});var val=null;if(/off|closed/i.test(time)){val="Closed";}else{var tm=time.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);if(tm){val=to12(tm[1])+" – "+to12(tm[2]);}}if(val){if(set.indexOf("Sa")>-1){out.sat=val;}if(set.indexOf("Su")>-1){out.sun=val;}}});return out;}
+function regionFor(la,lo,city){
+ if(city&&/cedar park/i.test(city)){return "Cedar Park · just north";}
+ if(city&&/round rock/i.test(city)){return "Round Rock · just north";}
+ if(city&&/pflugerville/i.test(city)){return "Pflugerville · northeast";}
+ if(city&&!/austin/i.test(city)){return city;}
+ if(la>=30.42){return (lo<=-97.75)?"Northwest Austin · close to home":"North Austin";}
+ if(la>=30.35){return (lo<=-97.80)?"West Austin":"North Austin";}
+ if(la>=30.28){return (lo>=-97.70)?"East Side":"Central Austin";}
+ return (lo>=-97.72)?"East Side":"South Austin";
+}
+var pend={la:null,lo:null,r:null};
+function fv(id){return document.getElementById(id).value.trim();}
+function lookUp(){
+ var n=fv("f-name"),a=fv("f-addr"),line=document.getElementById("f-look-line");
+ if(!n&&!a){line.textContent="Type a name or address first 🌿";return;}
+ line.textContent="Looking…";
+ fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&extratags=1&addressdetails=1&limit=1&q="+encodeURIComponent(n+" "+a+" Austin TX"))
+ .then(function(r){return r.json();})
+ .then(function(j){
+  if(!j||!j.length){line.textContent="Could not find it — you can still add it by hand 💛";return;}
+  var x=j[0];pend.la=+x.lat;pend.lo=+x.lon;
+  var ad=x.address||{},city=ad.city||ad.town||ad.village;
+  pend.r=regionFor(pend.la,pend.lo,city);
+  if(!fv("f-name")&&x.name){document.getElementById("f-name").value=x.name;}
+  var road=ad.house_number?(ad.house_number+" "+(ad.road||"")):(ad.road||"");
+  var full=[road,city,ad.state,ad.postcode].filter(Boolean).join(", ");
+  if(full.length>8){document.getElementById("f-addr").value=full;}
+  var msg="✓ Found it · "+pend.r;
+  var oh=x.extratags&&x.extratags.opening_hours;
+  if(oh){
+   var p=parseOSM(oh),filled=[];
+   if(p.sat&&!fv("f-sat")){document.getElementById("f-sat").value=p.sat;filled.push("Sat");}
+   if(p.sun&&!fv("f-sun")){document.getElementById("f-sun").value=p.sun;filled.push("Sun");}
+   msg+=filled.length?(" · filled in "+filled.join(" & ")+" hours from OpenStreetMap — worth double-checking"):(" · listed hours: "+oh);
+  } else { msg+=" · no hours on file, tap Hours on Google Maps"; }
+  line.textContent=msg;
+ }).catch(function(){line.textContent="Lookup hiccup — add it by hand and it still works 💛";});
+}
+function gmapsLook(){window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(fv("f-name")+" "+fv("f-addr")+" Austin TX"),"_blank","noopener");}
+function saveStop(){
+ var n=fv("f-name");
+ if(!n){document.getElementById("f-look-line").textContent="It needs a name 🌸";return;}
+ var k=document.getElementById("f-cat").value;
+ var st={id:Date.now(),k:k,n:n,a:fv("f-addr")||"Address not set",r:pend.r||"Monique's addition",t:fv("f-note"),sat:fv("f-sat"),sun:fv("f-sun"),ic:"⭐",mine:true};
+ if(pend.la){st.la=pend.la;st.lo=pend.lo;}
+ var all=loadMine();all.push(st);saveMine(all);
+ ["f-name","f-addr","f-sat","f-sun","f-note"].forEach(function(id){document.getElementById(id).value="";});
+ pend={la:null,lo:null,r:null};
+ document.getElementById("f-look-line").textContent="";
+ document.getElementById("addpanel").className="addpanel";
+ var b=document.getElementById("addtoggle").getBoundingClientRect();burst(b.left+b.width/2,b.top);
+ focusName=n;pick(k);
+}
+(function(){
+ var sel=document.getElementById("f-cat");
+ MOODS.forEach(function(m){var o=document.createElement("option");o.value=m.k;o.textContent=m.label.replace("&amp;","&");sel.appendChild(o);});
+ document.getElementById("addtoggle").addEventListener("click",function(){var p=document.getElementById("addpanel");p.className=(p.className.indexOf("open")>-1)?"addpanel":"addpanel open";});
+ document.getElementById("f-look").addEventListener("click",lookUp);
+ document.getElementById("f-gmaps").addEventListener("click",gmapsLook);
+ document.getElementById("f-cancel").addEventListener("click",function(){document.getElementById("addpanel").className="addpanel";});
+ document.getElementById("f-save").addEventListener("click",saveStop);
+})();
+
 makeSparkles();buildMoods();
 document.getElementById("d-sat").addEventListener("click",function(){setDay("sat");});
 document.getElementById("d-sun").addEventListener("click",function(){setDay("sun");});
