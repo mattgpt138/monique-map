@@ -206,7 +206,7 @@ lunch:[
 function miles(la1,lo1,la2,lo2){var R=3958.8,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,p1=la1*Math.PI/180,p2=la2*Math.PI/180;var x=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(p1)*Math.cos(p2)*Math.sin(dLo/2)*Math.sin(dLo/2);return 2*R*Math.asin(Math.sqrt(x));}
 function mapsUrl(d){var u="https://www.google.com/maps/dir/?api=1";if(myPos&&posSource==="device"){u+="&origin="+encodeURIComponent(myPos.la+","+myPos.lo);}return u+"&destination="+encodeURIComponent(d)+"&travelmode=driving";}
 function makeSparkles(){var b=document.getElementById("sparkles");for(var i=0;i<30;i++){var s=document.createElement("span");s.className="sp";var z=2+Math.random()*4;s.style.width=z+"px";s.style.height=z+"px";s.style.left=(Math.random()*100)+"%";s.style.top=(Math.random()*100)+"%";s.style.animationDelay=(Math.random()*3.4)+"s";b.appendChild(s);}}
-function burst(x,y){var b=document.getElementById("burst"),em=["✨","🌸","🍄","🦋","⭐","🌿"];for(var i=0;i<11;i++){(function(i){var p=document.createElement("span");p.className="particle";p.textContent=em[i%em.length];p.style.left=(x+(Math.random()*70-35))+"px";p.style.top=(y+(Math.random()*20-10))+"px";p.style.animationDelay=(Math.random()*0.25)+"s";b.appendChild(p);setTimeout(function(){if(p.parentNode){p.parentNode.removeChild(p);}},1600);})(i);}}
+function burst(x,y,em){var b=document.getElementById("burst");em=em||["✨","🌸","🍄","🦋","⭐","🌿"];for(var i=0;i<11;i++){(function(i){var p=document.createElement("span");p.className="particle";p.textContent=em[i%em.length];p.style.left=(x+(Math.random()*70-35))+"px";p.style.top=(y+(Math.random()*20-10))+"px";p.style.animationDelay=(Math.random()*0.25)+"s";b.appendChild(p);setTimeout(function(){if(p.parentNode){p.parentNode.removeChild(p);}},1600);})(i);}}
 function buildMoods(){var g=document.getElementById("moodgrid");MOODS.forEach(function(m){var b=document.createElement("button");b.className="moodbtn";b.id="m-"+m.k;b.innerHTML='<span class="ic">'+m.ic+'</span><span class="lab">'+m.label+'</span>';b.addEventListener("click",function(){var r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);focusName=null;pick(m.k);});g.appendChild(b);});}
 function pick(k){mood=k;MOODS.forEach(function(m){document.getElementById("m-"+m.k).className="moodbtn"+(m.k===k?" active":"");});render();}
 function setDay(d){day=d;document.getElementById("d-sat").className="daybtn"+(d==="sat"?" active":"");document.getElementById("d-sun").className="daybtn"+(d==="sun"?" active":"");render();}
@@ -358,8 +358,8 @@ function saveStop(){
 })();
 
 makeSparkles();buildMoods();
-document.getElementById("d-sat").addEventListener("click",function(){setDay("sat");});
-document.getElementById("d-sun").addEventListener("click",function(){setDay("sun");});
+document.getElementById("d-sat").addEventListener("click",function(){var r=this.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);setDay("sat");});
+document.getElementById("d-sun").addEventListener("click",function(){var r=this.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,["✨","🎂"]);setDay("sun");});
 document.getElementById("s-trail").addEventListener("click",useTrailOrder);
 document.getElementById("s-near").addEventListener("click",useNearest);
 document.getElementById("surprise").addEventListener("click",surpriseMe);
