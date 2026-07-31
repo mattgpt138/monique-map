@@ -88,6 +88,10 @@ footer .hb{font-family:'Baloo 2',cursive;font-size:1.05rem;color:var(--forest);d
 .addwrap{max-width:540px;margin:16px auto 0;}
 .addbtn{display:block;margin:0 auto;padding:9px 20px;border-radius:22px;border:1.5px dashed var(--gold);background:rgba(255,253,247,.9);color:#8a6a45;font-weight:700;font-size:.82rem;font-family:'Quicksand';cursor:pointer;}
 .addbtn:active{transform:scale(.97);}
+.syncline{text-align:center;margin-top:6px;font-size:.66rem;font-weight:700;color:#a08a72;letter-spacing:.02em;cursor:pointer;min-height:14px;}
+.syncline.ok{color:#8a6a45;}
+.syncline.bad{color:#b4785c;}
+.syncline.w{color:#a08a72;opacity:.8;}
 .addpanel{display:none;margin-top:12px;background:#fffdf8;border:1.5px solid var(--gold);border-radius:20px;padding:14px;box-shadow:0 8px 20px rgba(92,75,63,.12);}
 .addpanel.open{display:block;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) forwards;}
 .addpanel h4{font-family:'Baloo 2',cursive;color:var(--forest);font-size:1.02rem;}
@@ -132,9 +136,10 @@ footer .hb{font-family:'Baloo 2',cursive;font-size:1.05rem;color:var(--forest);d
 <div class="locnote" id="locnote"></div>
 <div class="addwrap">
 <button class="addbtn" id="addtoggle">➕ Add a stop</button>
+<div class="syncline" id="syncline" title="Tap to refresh"></div>
 <div class="addpanel" id="addpanel">
 <h4>Add your own stop</h4>
-<div class="tiny">Type a place, tap Look it up, and it lands on your trail in the category you pick.</div>
+<div class="tiny">Type a place, tap Look it up, and it lands on your trail in the category you pick. It saves to the map itself, so everyone sees it.</div>
 <div class="fld"><label>Place name</label><input id="f-name" placeholder="e.g. Radio Coffee &amp; Beer"></div>
 <div class="fld"><label>Address or neighborhood</label><input id="f-addr" placeholder="e.g. 4204 Menchaca Rd, Austin"></div>
 <div class="acts" style="justify-content:flex-start"><button class="mini" id="f-look">🔍 Look it up</button><button class="mini ghost" id="f-gmaps">Hours on Google Maps ↗</button></div>
@@ -232,10 +237,34 @@ function render(){
 function surpriseMe(){var pool=[];Object.keys(PLACES).forEach(function(k){PLACES[k].forEach(function(p){if(p[day]!=="Closed"){pool.push({k:k,p:p});}});});var c=pool[Math.floor(Math.random()*pool.length)];var r=document.getElementById("surprise").getBoundingClientRect();burst(r.left+r.width/2,r.top);focusName=c.p.n;pick(c.k);}
 
 var STORE="mstops2026";
-function loadMine(){try{return JSON.parse(localStorage.getItem(STORE)||"[]");}catch(e){return [];}}
-function saveMine(a){try{localStorage.setItem(STORE,JSON.stringify(a));}catch(e){}}
+var PQ="mstops2026q";
+var CLOUD="https://jsonblob.com/api/jsonBlob/019fb905-a651-7aa0-a5ac-c50e6b32c60e";
+var MINE=null,syncing=false;
+function lsGet(k,d){try{return JSON.parse(localStorage.getItem(k)||d);}catch(e){return JSON.parse(d);}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function loadMine(){if(!MINE){MINE=lsGet(STORE,"[]");}return MINE;}
+function saveMine(a){MINE=a;lsSet(STORE,a);}
+function queue(){return lsGet(PQ,'{"add":[],"del":[]}');}
+function syncMsg(txt,cls){var e=document.getElementById("syncline");if(e){e.textContent=txt;e.className="syncline "+(cls||"");}}
+function applyQ(list,q){var out=list.slice();(q.add||[]).forEach(function(s){var dup=false;for(var i=0;i<out.length;i++){if(String(out[i].id)===String(s.id))dup=true;}if(!dup)out.push(s);});return out.filter(function(x){return (q.del||[]).indexOf(String(x.id))<0;});}
+function cloudGet(){return fetch(CLOUD,{cache:"no-store",headers:{"Accept":"application/json"}}).then(function(r){if(!r.ok)throw new Error("get");return r.json();}).then(function(j){return (j&&j.stops)||[];});}
+function cloudPut(list){return fetch(CLOUD,{method:"PUT",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({stops:list,updated:Date.now()})}).then(function(r){if(!r.ok)throw new Error("put");return true;});}
+function sync(mut){
+ var q=queue();
+ if(mut){q=mut(q)||q;lsSet(PQ,q);saveMine(applyQ(loadMine(),q));render();}
+ if(syncing)return;syncing=true;
+ syncMsg("\u21bb syncing\u2026","w");
+ cloudGet().then(function(cloud){
+  var q2=queue(),merged=applyQ(cloud,q2),dirty=(q2.add||[]).length||(q2.del||[]).length;
+  saveMine(merged);render();
+  if(dirty){return cloudPut(merged).then(function(){lsSet(PQ,{add:[],del:[]});syncMsg("\u2728 saved \u2014 everyone sees this map","ok");});}
+  syncMsg("\u2728 in sync \u2014 everyone sees this map","ok");
+ }).catch(function(){
+  syncMsg("\ud83d\udcf6 saved on this phone \u2014 will sync when you're online","bad");
+ }).then(function(){syncing=false;});
+}
 function itemsFor(k){return PLACES[k].concat(loadMine().filter(function(x){return x.k===k;}));}
-function bindRemove(){var b=document.querySelectorAll(".rm");for(var i=0;i<b.length;i++){b[i].addEventListener("click",function(ev){ev.preventDefault();var id=this.getAttribute("data-id");if(confirm("Take this stop off the map?")){saveMine(loadMine().filter(function(x){return String(x.id)!==String(id);}));render();}});}}
+function bindRemove(){var b=document.querySelectorAll(".rm");for(var i=0;i<b.length;i++){b[i].addEventListener("click",function(ev){ev.preventDefault();var id=this.getAttribute("data-id");if(confirm("Take this stop off the map?")){sync(function(q){q.del=(q.del||[]).concat([String(id)]);q.add=(q.add||[]).filter(function(s){return String(s.id)!==String(id);});return q;});}});}}
 function to12(t){var p=t.split(":");var h=parseInt(p[0],10),m=p[1]||"00";if(h===24||h===0){return "12:"+m+" AM";}var ap=h<12?"AM":"PM";var hh=h%12;if(hh===0){hh=12;}return hh+":"+m+" "+ap;}
 function parseOSM(s){var out={};if(!s){return out;}var days=["Mo","Tu","We","Th","Fr","Sa","Su"];s.split(";").forEach(function(rule){rule=rule.trim();if(!rule){return;}var m=rule.match(/^([A-Za-z,\-]+)\s+(.+)$/);if(!m){return;}var spec=m[1],time=m[2].trim(),set=[];spec.split(",").forEach(function(part){var rr=part.split("-");if(rr.length===2){var i1=days.indexOf(rr[0]),i2=days.indexOf(rr[1]);if(i1>-1&&i2>-1){for(var i=i1;i<=i2;i++){set.push(days[i]);}}}else if(days.indexOf(part)>-1){set.push(part);}});var val=null;if(/off|closed/i.test(time)){val="Closed";}else{var tm=time.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);if(tm){val=to12(tm[1])+" – "+to12(tm[2]);}}if(val){if(set.indexOf("Sa")>-1){out.sat=val;}if(set.indexOf("Su")>-1){out.sun=val;}}});return out;}
 function regionFor(la,lo,city){
@@ -292,7 +321,7 @@ function saveStop(){
  var k=document.getElementById("f-cat").value;
  var st={id:Date.now(),k:k,n:n,a:fv("f-addr")||"Address not set",r:pend.r||"Monique's addition",t:fv("f-note"),sat:fv("f-sat"),sun:fv("f-sun"),ic:"⭐",mine:true};
  if(pend.la){st.la=pend.la;st.lo=pend.lo;}
- var all=loadMine();all.push(st);saveMine(all);
+ sync(function(q){q.add=(q.add||[]).concat([st]);return q;});
  ["f-name","f-addr","f-sat","f-sun","f-note"].forEach(function(id){document.getElementById(id).value="";});
  pend={la:null,lo:null,r:null};
  document.getElementById("f-look-line").textContent="";
@@ -316,7 +345,12 @@ document.getElementById("d-sun").addEventListener("click",function(){setDay("sun
 document.getElementById("s-trail").addEventListener("click",useTrailOrder);
 document.getElementById("s-near").addEventListener("click",useNearest);
 document.getElementById("surprise").addEventListener("click",surpriseMe);
+document.getElementById("syncline").addEventListener("click",function(){sync(null);});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)sync(null);});
+window.addEventListener("online",function(){sync(null);});
 render();
+sync(null);
+setInterval(function(){if(!document.hidden)sync(null);},45000);
 </script>
 </body>
 </html>
